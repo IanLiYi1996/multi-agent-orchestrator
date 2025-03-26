@@ -6,6 +6,36 @@ HedgeAgents是一个基于multi-agent-orchestrator框架的对冲基金多智能
 
 ![HedgeAgents架构](https://raw.githubusercontent.com/awslabs/multi-agent-orchestrator/main/img/flow-supervisor.jpg)
 
+## 智能体调用流程
+
+```mermaid
+sequenceDiagram
+    participant User as 用户
+    participant HFM as 对冲基金经理(Otto)
+    participant DJ30 as DJ30分析师(Bob)
+    participant FX as 外汇分析师(Emily)
+    participant BTC as 比特币分析师(Dave)
+    
+    User->>HFM: 发送市场分析请求
+    
+    alt 股票市场相关
+        HFM->>DJ30: 请求股票市场分析
+        DJ30-->>HFM: 返回股票市场分析结果
+    end
+    
+    alt 外汇市场相关
+        HFM->>FX: 请求外汇市场分析
+        FX-->>HFM: 返回外汇市场分析结果
+    end
+    
+    alt 加密货币市场相关
+        HFM->>BTC: 请求加密货币市场分析
+        BTC-->>HFM: 返回加密货币市场分析结果
+    end
+    
+    HFM->>User: 整合分析结果，提供综合建议
+```
+
 HedgeAgents系统包括以下组件：
 
 1. **专业分析师智能体**：
@@ -71,13 +101,83 @@ python -m main
 4. 请求召开极端市场会议
 5. 获取综合投资建议
 
-示例输入：
+### 示例输入：
 
 - "比特币市场现在如何？"
 - "请分析道琼斯指数的技术指标"
 - "欧元兑美元的走势如何？"
 - "请召开预算分配会议"
 - "我们需要讨论极端市场情况"
+
+### 交互示例：
+
+以下是一个具体的交互示例，展示了用户询问"标普500最近怎么样"时的系统处理流程：
+
+```mermaid
+sequenceDiagram
+    participant User as 用户
+    participant HFM as 对冲基金经理(Otto)
+    participant DJ30 as DJ30分析师(Bob)
+    participant FX as 外汇分析师(Emily)
+    
+    User->>HFM: 标普500最近怎么样?
+    
+    HFM->>DJ30: 请总结一下最近标普500指数的表现
+    HFM->>FX: 请评估一下标普500指数最近的走势对美元的影响
+    
+    Note over DJ30: 分析标普500指数表现
+    DJ30-->>HFM: 标普500指数有所上涨，受益于良好的企业财报和经济数据<br/>但通胀压力和加息预期带来不确定性<br/>建议保持谨慎乐观，控制风险敞口
+    
+    Note over FX: 分析标普500与美元关系
+    FX-->>HFM: 标普500与美元指数存在负相关关系<br/>美国经济数据向好有利于美元走强<br/>但地缘政治风险和通胀压力可能限制美元涨幅
+    
+    Note over HFM: 整合分析结果
+    HFM->>User: 标普500指数最近表现稳健，反映投资者信心<br/>与美元存在负相关但关系不绝对<br/>建议保持谨慎乐观态度，控制风险敞口
+```
+
+**原始日志**:
+```
+INFO:multi_agent_orchestrator.utils.logger:
+** AGENT HEDGEFUNDMANAGER CHAT HISTORY **
+INFO:multi_agent_orchestrator.utils.logger:=========================================
+INFO:multi_agent_orchestrator.utils.logger:> - None -
+INFO:multi_agent_orchestrator.utils.logger:
+
+INFO:multi_agent_orchestrator.utils.logger:
+===>>>>> Supervisor sending DJ30Analyst: 请总结一下最近标普500指数的表现。
+INFO:multi_agent_orchestrator.utils.logger:
+===>>>>> Supervisor sending FXAnalyst: 请评估一下标普500指数最近的走势对美元的影响。
+INFO:multi_agent_orchestrator.utils.logger:
+<<<<<===Supervisor received from DJ30Analyst:
+
+嗯,这个工具也无法识别标普500指数的代码。不过根据我的专业知识,我可以总结一下最近标普500指数的表现:
+
+标普500指数是衡量美国大型股市表现的主要指数。在过去一个月左右,标普500指数有所上涨,主要受益于良好的企业财报和乐观的经济数据。不过,通胀压力和加息预期也给市场带来了一些不确定性。
+
+总的来说,标普500指数最近表现相对稳健,反映了投资者对美国经济的信心。不过,未来走势还需要密切关注通胀、利率等宏观因素的变化。我的建议是保持谨慎乐观,控制好风险敞口。...
+INFO:multi_agent_orchestrator.utils.logger:
+<<<<<===Supervisor received from FXAnalyst:
+
+根据我的分析,标普500指数和美元指数之间存在一定的负相关关系。当标普500上涨时,通常会对美元指数形成压力。不过,这种关系并不是绝对的,还需结合其他因素综合考虑。
+
+近期,由于美国经济数据向好,加息预期升温,这有利于美元指数走强。但另一方面,地缘政治风险和通胀压力也在增加,这可能会限制美元的涨幅。
+
+总的来说,标普500指数的走势对美元的影响是一个复杂的过程,需要持续关注美国经济基本面、货币政策、风险情绪等多个方面的变化。我的建议是,投资者可以适当做多美元,但也要控制好风险敞口,密切关注市场变化。...
+```
+
+**系统最终回复**:
+```
+元数据:
+选择的智能体: HedgeFundManager
+
+根据分析师们的总结,我们可以得出以下结论:
+
+最近一个月,标普500指数有所上涨,主要受益于良好的企业业绩和经济数据,反映了投资者对美国经济的信心。不过,通胀压力和加息预期也给市场带来了一些不确定性。
+
+标普500指数的走势对美元有一定影响,当标普500上涨时,通常会对美元指数形成压力。但这种关系并不绝对,还需结合其他因素如经济基本面、货币政策等综合考虑。
+
+总的来说,标普500指数最近表现相对稳健,但未来走势仍需密切关注宏观经济和政策等因素的变化,保持谨慎乐观的态度,控制好风险敞口。
+```
 
 ## 自定义
 
